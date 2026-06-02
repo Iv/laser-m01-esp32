@@ -1,4 +1,6 @@
 # laser-m01-esp32
+[Read in English](README_EN.md)
+
 Integración de un Módulo de medición de distancia láser de alta presión en una placa de desarrollo ESP32 Wemos Lolin32. 
 
 Módulo Laser Range (M01, 6 pines) con ESP32 (LOLIN32)
