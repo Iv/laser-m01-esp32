@@ -13,7 +13,7 @@
 
 // --- Pins (adjust if using others) ---
 static const int PIN_RX  = 33;   // Module TXD -> ESP32 RX
-static const int PIN_TX  = 32;   // Module RXD <- ESP32 TX
+static const int PIN_TX  = 43;   // Module RXD <- ESP32 TX
 static const int PIN_ENA = 5;    // ENA (HIGH = active)
 
 // --- UART ---
