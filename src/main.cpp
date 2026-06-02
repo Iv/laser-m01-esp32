@@ -1,34 +1,34 @@
-// =====Laser ranger M01 (6 pines) – Minimal Q/L/K/R =====
+// ===== Laser ranger M01 (6 pins) – Minimal Q/L/K/R =====
 // SPDX-License-Identifier: MIT 
 // Copyright (c) 2025 Andres Ros
 // ESP32 Wemos Lolin32
 // Laser ranging sensor 50m (Liancheng Electronics (Shenzhen) Co., Ltd. Store) AliExpress
-// LOLIN32/ESP32: TX del módulo (amarillo) -> RX ESP32 (GPIO33)
-//                RX del módulo (verde)    <- TX ESP32 (GPIO32)
-//                ENA -> GPIO5 (alto), MIN->3V3, GND->GND
-// L=Enciende Laser, Q= lectura rápida, K= Apaga Laser, R= reinicia módulo
-// medida metros y dos decimales
+// LOLIN32/ESP32: Module TX (yellow) -> ESP32 RX (GPIO33)
+//                Module RX (green)  <- ESP32 TX (GPIO32)
+//                ENA -> GPIO5 (high), MIN->3V3, GND->GND
+// L=Laser ON, Q= Quick reading, K= Laser OFF, R= Reset module
+// Measure in meters with two decimal places
 
 #include <Arduino.h>
 
-// --- Pines (ajusta si usas otros) ---
-static const int PIN_RX  = 33;   // Módulo TXD -> RX ESP32
-static const int PIN_TX  = 32;   // Módulo RXD <- TX ESP32
-static const int PIN_ENA = 5;    // ENA (HIGH = activo)
+// --- Pins (adjust if using others) ---
+static const int PIN_RX  = 33;   // Module TXD -> ESP32 RX
+static const int PIN_TX  = 32;   // Module RXD <- ESP32 TX
+static const int PIN_ENA = 5;    // ENA (HIGH = active)
 
 // --- UART ---
 HardwareSerial LZR(2);
 
-// --- Comandos ---
+// --- Commands ---
 const uint8_t CMD_LASER_ON[]  = {0xAA,0x00,0x01,0xBE,0x00,0x01,0x00,0x01,0xC1};
 const uint8_t CMD_LASER_OFF[] = {0xAA,0x00,0x01,0xBE,0x00,0x01,0x00,0x00,0xC0};
 const uint8_t CMD_QUICK[]     = {0xAA,0x00,0x00,0x22,0x00,0x01,0x00,0x00,0x23};
 const uint8_t CMD_READ_RES[]  = {0xAA,0x80,0x00,0x22,0xA2};
 
-// --- Estado ---
+// --- Status ---
 float lastMeters = NAN;
 
-// --- Utilidades ---
+// --- Utilities ---
 static inline void enaHigh(){ pinMode(PIN_ENA,OUTPUT); digitalWrite(PIN_ENA,HIGH); }
 static inline void enaLow(){  pinMode(PIN_ENA,OUTPUT); digitalWrite(PIN_ENA,LOW);  }
 static inline void powerCycle(){ enaLow(); delay(120); enaHigh(); delay(400); }
@@ -40,7 +40,7 @@ static inline uint32_t bcd32(const uint8_t* b){
   uint32_t v=0; for(int i=0;i<4;i++){ v=v*100 + ((b[i]>>4)&0x0F)*10 + (b[i]&0x0F); } return v;
 }
 
-// Lee durante 'ms' y, si encuentra frame válido (13B), imprime metros y devuelve true
+// Read for 'ms' and, if valid frame (13B) found, print meters and return true
 bool readMeters(unsigned long ms){
   uint8_t f[16]; int pos=0; unsigned long t0=millis(), last=0; bool any=false;
   while(millis()-t0 < ms){
@@ -66,22 +66,22 @@ bool readMeters(unsigned long ms){
   return any;
 }
 
-// --- Acciones ---
+// --- Actions ---
 void doLaserOn(){  LZR.write(CMD_LASER_ON,  sizeof(CMD_LASER_ON));  LZR.flush(); }
 void doLaserOff(){ LZR.write(CMD_LASER_OFF, sizeof(CMD_LASER_OFF)); LZR.flush(); }
 
 void doQuick(){
-  while(LZR.available()) LZR.read();           // limpia RX
+  while(LZR.available()) LZR.read();           // clear RX
   LZR.write(CMD_QUICK, sizeof(CMD_QUICK)); LZR.flush();
-  if(!readMeters(2000)){                       // espera frame
-    LZR.write(CMD_READ_RES, sizeof(CMD_READ_RES)); LZR.flush(); // intenta último resultado
+  if(!readMeters(2000)){                       // wait for frame
+    LZR.write(CMD_READ_RES, sizeof(CMD_READ_RES)); LZR.flush(); // try last result
     readMeters(800);
   }
 }
 
-void doReset(){                                // R = "borrar/puesta a cero"
-  powerCycle();                                 // reinicia solo el módulo
-  while(LZR.available()) LZR.read();            // limpia RX
+void doReset(){                                // R = "clear/zeroing"
+  powerCycle();                                 // restarts only the module
+  while(LZR.available()) LZR.read();            // clear RX
   lastMeters = NAN;
   Serial.println("OK RESET");
 }
@@ -92,7 +92,7 @@ void setup(){
   enaHigh();
   LZR.begin(9600, SERIAL_8N1, PIN_RX, PIN_TX);
 
-  Serial.println("\nM01 listo: Q=medir  L=laser ON  K=laser OFF  R=reset");
+  Serial.println("\nM01 ready: Q=measure  L=laser ON  K=laser OFF  R=reset");
 }
 
 void loop(){
@@ -103,6 +103,6 @@ void loop(){
     else if(c=='K') doLaserOff();
     else if(c=='R') doReset();
   }
-  // por si llegan frames (p.ej., continuo activado desde fuera)
+  // in case frames arrive (e.g., continuous activated from outside)
   if(LZR.available()) readMeters(200);
 }
