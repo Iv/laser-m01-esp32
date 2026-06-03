@@ -1,71 +1,71 @@
 # laser-m01-esp32
-[Read in English](README_EN.md)
+[Leer en Español](README_ESP.md)
 
-Integración de un Módulo de medición de distancia láser de alta presión en una placa de desarrollo ESP32 Wemos Lolin32. 
+Integration of a high-precision laser distance measurement module into an ESP32 Wemos Lolin32 development board.
 
-Módulo Laser Range (M01, 6 pines) con ESP32 (LOLIN32)
+Laser Range Module (M01, 6 pins) with ESP32 (LOLIN32)
 
-Integración de un Módulo de medición de distancia láser de alta presión en una placa de desarrollo ESP32 Wemos Lolin32. 
+Integration of a high-precision laser distance measurement module into an ESP32 Wemos Lolin32 development board.
 
-Materiales: Módulo Laser ranging sensor de 50m de Liancheng Electronics (Aliespress).
+Materials: 50m Laser ranging sensor module from Liancheng Electronics (AliExpress).
 
-Ejemplo mínimo y funcional para leer distancias por UART desde un módulo láser M01 (placa de 6 pines) usando un ESP32 (Wemos LOLIN32).
-Teclas: Q (medir), L (laser ON), K (laser OFF), R (reset del módulo).
+Minimal and functional example to read distances via UART from an M01 laser module (6-pin board) using an ESP32 (Wemos LOLIN32).
+Keys: Q (measure), L (laser ON), K (laser OFF), R (module reset).
 
 Hardware
-•	Módulo láser M01 (placa 6 pines). Liancheng Electronics (Shenzhen) Co., Ltd. Store) AliExpress
-•	ESP32 Wemos LOLIN32 (cualquier ESP32 sirve).
+•	M01 laser module (6-pin board). Liancheng Electronics (Shenzhen) Co., Ltd. Store) AliExpress
+•	ESP32 Wemos LOLIN32 (any ESP32 will work).
+•	3.3 V Power supply (min. ~150 mA recommended).
+•	Dupont cables / soldering.
 
-•	Alimentación 3.3 V (mín. ~150 mA recomendados).
-
-•	Cables Dupont / soldadura.
-
-Pinout del módulo (de arriba → abajo)
-
-1.	MIN (3V3) – alimentación 3.3 V
-2.	ENA – enable (activo en alto)
-4.	GND – masa
-5.	RXD – entrada UART del módulo
-6.	TXD – salida UART del módulo
+Module Pinout (top → bottom)
+1.	MIN (3V3) – 3.3 V power supply
+2.	ENA – enable (active high)
+4.	GND – ground
+5.	RXD – module UART input
+6.	TXD – module UART output
 7.	NC
-8.	
-Colores del mazo (según fabricante)
-•	Rojo = MIN (3V3)
-•	Negro = GND
-•	Verde = RXD (del módulo)
-•	Amarillo = TXD (del módulo)
 
-Ojo: TX del módulo → RX del ESP32, RX del módulo ← TX del ESP32 (cruzado).
-Conexión recomendada (ESP32 LOLIN32)
+Wiring Colors (according to manufacturer)
+•	Red = MIN (3V3)
+•	Black = GND
+•	Green = RXD (module)
+•	Yellow = TXD (module)
 
-•	Rojo (MIN) → 3V3
-•	Negro (GND) → GND
-•	Amarillo (TXD módulo) → GPIO33 (RX del ESP32)
-•	Verde (RXD módulo) ← GPIO32 (TX del ESP32)
-•	ENA (si está accesible) → GPIO5 en HIGH (o directo a 3V3)
-Si tu mazo solo saca 4 hilos (rojo/negro/verde/amarillo), ENA suele ir integrado a alto debes conectarlo.
-________________________________________
-Uso
-1.	Carga el sketch y abre Monitor Serie a 115200.
-2.	Conecta el láser a una pared mate (2–4 m) con fondo oscuro.
-3.	Pulsa:
-o	L → enciende el láser.
-o	Q → lectura rápida (muestra X.XXX).
-o	K → apaga el láser.
-o	R → reinicia el módulo (corta y restablece ENA).
-Nota: el emisor suele ser infrarrojo; el “punto” no se ve a simple vista. Con la cámara del móvil sí se aprecia.
-________________________________________
-Diagnóstico rápido (si no hay datos en RX)
-•	Cables cruzados: Amarillo (TXD módulo) → RX del ESP32; Verde (RXD módulo) ← TX del ESP32.
-•	GND común entre módulo y ESP32.
-•	ENA alto (GPIO5 HIGH o 3V3).
-•	Eco por cable (prueba exprés): Puentea verde↔amarillo en el conector del módulo; lo que envíe el ESP32 debe volver idéntico por RX. Si no hay eco → revisar soldaduras/continuidad en GPIO33/GPIO32 ↔ conector.
-•	Si tu unidad viene a 115200, cambia el LZR.begin(9600, …) por 115200.
-________________________________________
-Seguridad
-•	Es IR (≈905–940 nm). No apuntar a ojos ni a superficies reflectantes cercanas.
-________________________________________
-Agradecimientos
-Agradecemos especialmente la colaboración y soporte de Liancheng Electronics (Shenzhen) Co., Ltd. Store, que nos facilitó el esquema de colores del mazo y ayudó a resolver los problemas de conexión RX/TX.
-Enlaces de compras: https://www.aliexpress.com/store/1104805174?spm=a2g0o.order_list.order_list_main.8.21ef194dfoSHNu
+Note: Module TX → ESP32 RX, Module RX ← ESP32 TX (crossed).
 
+Recommended Connection (ESP32 LOLIN32)
+•	Red (MIN) → 3V3
+•	Black (GND) → GND
+•	Yellow (module TXD) → GPIO33 (ESP32 RX)
+•	Green (module RXD) ← GPIO32 (ESP32 TX)
+•	ENA (if accessible) → GPIO5 set to HIGH (or direct to 3V3)
+If your harness only has 4 wires (red/black/green/yellow), ENA is usually integrated high or must be connected.
+
+________________________________________
+Usage
+1.	Upload the sketch and open Serial Monitor at 115200 baud.
+2.	Point the laser at a matte wall (2–4 m) with a dark background.
+3.	Press:
+o	L → turn on laser.
+o	Q → quick reading (shows X.XXX).
+o	K → turn off laser.
+o	R → restart the module (cuts and restores ENA).
+Note: The emitter is usually infrared; the "dot" is not visible to the naked eye. It can be seen using a phone camera.
+
+________________________________________
+Quick Troubleshooting (if no data on RX)
+•	Crossed wires: Yellow (module TXD) → ESP32 RX; Green (module RXD) ← ESP32 TX.
+•	Common GND between module and ESP32.
+•	ENA high (GPIO5 HIGH or 3V3).
+•	Cable loopback (express test): Bridge green ↔ yellow on the module connector; whatever the ESP32 sends should return identical via RX. If there's no echo → check soldering/continuity on GPIO33/GPIO32 ↔ connector.
+•	If your unit is set to 115200, change LZR.begin(9600, ...) to 115200.
+
+________________________________________
+Safety
+•	It is IR (≈905–940 nm). Do not point at eyes or nearby reflective surfaces.
+
+________________________________________
+Acknowledgements
+We especially appreciate the collaboration and support of Liancheng Electronics (Shenzhen) Co., Ltd. Store, which provided the harness color scheme and helped resolve RX/TX connection issues.
+Store link: https://www.aliexpress.com/store/1104805174?spm=a2g0o.order_list.order_list_main.8.21ef194dfoSHNu
